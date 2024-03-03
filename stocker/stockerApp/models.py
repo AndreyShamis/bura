@@ -1,13 +1,11 @@
 from django.db import models
 from django.utils import timezone
-from django.core.validators import MinValueValidator
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 
 class Exchange(models.Model):
-    # Название биржи
     name = models.CharField(max_length=255)
-    # Сайт биржи
     website = models.URLField()
 
     def __str__(self):
@@ -15,27 +13,20 @@ class Exchange(models.Model):
     
 
 class Stock(models.Model):
-    # Биржа
-    exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE) #models.CharField(max_length=255)
+    exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE)
     symbol = models.CharField(max_length=10, unique=True)
     company_name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    # Изменение цены
     price_change = models.DecimalField(max_digits=10, decimal_places=2)
-    # Процентное изменение
     percent_change = models.DecimalField(max_digits=5, decimal_places=2)
-    # Объем торгов
     volume = models.IntegerField()
-    # Рыночная капитализация
     market_cap = models.DecimalField(max_digits=20, decimal_places=2)
-
     sector = models.CharField(max_length=100, blank=True, null=True)
     industry = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.ticker} ({self.company_name}- {self.price} - {self.market_type})"
+        return f"{self.symbol} ({self.company_name}- {self.price})"
 
-    # Индикаторы
     @property
     def is_bullish(self):
         return self.price_change > 0
@@ -64,16 +55,6 @@ class StockPrice(models.Model):
 
     def __str__(self):
         return f"{self.stock.symbol} - {self.timestamp} - {self.price} - {self.market_type}"
-
-    
-
-# class Ticker(models.Model):
-#     # Тикер
-#     ticker = models.CharField(max_length=10, unique=True)
-#     exchange = models.CharField(max_length=255)
-
-#     def __str__(self):
-#         return self.ticker
 
 
 class Sector(models.Model):
@@ -107,7 +88,6 @@ class StockNews(models.Model):
     date = models.DateField(auto_now_add=True)
 
 
-
 class IndicatorCalculator:
     @staticmethod
     def calculate_sma(data, window):
@@ -124,8 +104,6 @@ class IndicatorCalculator:
         for price in data[window:]:
             ema = (price - ema) * k + ema
         return ema
-
-    # Реализуйте расчет других индикаторов, таких как RSI, MACD и т.д.
 
 
 class StockPriceSerializer(serializers.ModelSerializer):
@@ -164,6 +142,6 @@ class StockPriceDetail(APIView):
 
 
 urlpatterns = [
-    path('stocks/', StockPriceList.as_view(), name='stock-list'),
-    path('stocks/<str:symbol>/', StockPriceDetail.as_view(), name='stock-detail'),
+    path('api/stocks/', StockPriceList.as_view()),
+    path('api/stocks/<str:symbol>/', StockPriceDetail.as_view()),
 ]
