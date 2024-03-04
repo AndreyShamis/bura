@@ -186,7 +186,7 @@ class Ticker(models.Model):
         return f'{self.symbol} - {self.currentPrice} [{self.askSize}/{self.bidSize}]'
 
     @staticmethod
-    def fetch_ticker_data(symbol):
+    def fetch_ticker_data(symbol: str):
         # Fetch data using yfinance
         ticker = yf.Ticker(symbol)
         ticker_info = ticker.info

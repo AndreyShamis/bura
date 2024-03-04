@@ -1,0 +1,82 @@
+<!-- stock_data.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Data</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <tbody>
+            <tr>
+                <td><a href="/admin">Admin</a></td>
+                <td>Main</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+<body>
+    <h4>Tickers</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>ask</th>
+                <th>askSize</th>
+                <th>bidSize</th>
+                <th>bid</th>
+                <th>openPrice</th>
+                <th>currentPrice</th>
+                <th>dayHigh</th>
+                <th>dayLow</th>
+                <th>previousClose</th>
+                <th>quoteType</th>
+                <th>targetHighPrice</th>
+                <th>targetLowPrice</th>
+                <th>targetMeanPrice</th>
+                <th>targetMedianPrice</th>
+                <th>longName</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticker in tickers %}
+            <tr>
+                <td><a href="{% url  'stock' stock=ticker.symbol %}">{{ ticker.symbol }}</a></td>
+                <td>{{ ticker.ask }}</td>
+                <td>{{ ticker.askSize }}</td>
+                <td>{{ ticker.bidSize }}</td>
+                <td>{{ ticker.bid }}</td>
+                <td>{{ ticker.openPrice }}</td>
+                <td>{{ ticker.currentPrice }}</td>
+                <td>{{ ticker.dayHigh }}</td>
+                <td>{{ ticker.dayLow }}</td>
+                <td>{{ ticker.previousClose }}</td>
+                <td>{{ ticker.quoteType }}</td>
+                <td>{{ ticker.targetHighPrice }}</td>
+                <td>{{ ticker.targetLowPrice }}</td>
+                <td>{{ ticker.targetMeanPrice }}</td>
+                <td>{{ ticker.targetMedianPrice }}</td>
+                <td>{{ ticker.longName }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
