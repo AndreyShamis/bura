@@ -1,0 +1,52 @@
+<!-- stock_data.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Data</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h4>Stock Data <strong style='color: red;'>{{ symbol }}</strong></h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Close</th>
+                <th>Adj Close</th>
+                <th>Volume</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in stock_data %}
+            <tr>
+                <td>{{ row.Date }}</td>
+                <td>{{ row.Open }}</td>
+                <td>{{ row.High }}</td>
+                <td>{{ row.Low }}</td>
+                <td>{{ row.Close }}</td>
+                <td>{{ row.Adjusted }}</td>
+                <td>{{ row.Volume }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
