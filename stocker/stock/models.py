@@ -6,6 +6,11 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from django.urls import path
 import yfinance as yf
+import requests
+from bs4 import BeautifulSoup
+import pprint
+import re
+import logging
 
 
 class Exchange(models.Model):
@@ -43,12 +48,18 @@ class Industry(models.Model):
 
     @staticmethod
     def fetch_industry(name, industryKey, industryDisp, sector):
-        obj, created = Industry.objects.get_or_create(name=name, industryKey=industryKey, industryDisp=industryDisp, sector=sector)
-        obj.save()
-        return obj
+        try:
+            obj, created = Industry.objects.get_or_create(name=name, industryKey=industryKey, industryDisp=industryDisp, sector=sector)
+            obj.save()
+            return obj
+        except Exception:
+            return None
 
 class Ticker(models.Model):
     symbol = models.CharField(max_length=10, unique=True)
+
+    preMarket = models.FloatField(null=True, blank=True)
+    postMarket = models.FloatField(null=True, blank=True)
     fiftyTwoWeekChange = models.FloatField(null=True, blank=True)
     SandP52WeekChange = models.FloatField(null=True, blank=True)
     address1 = models.CharField(max_length=255, null=True, blank=True)
@@ -184,6 +195,35 @@ class Ticker(models.Model):
 
     def __str__(self):
         return f'{self.symbol} - {self.currentPrice} [{self.askSize}/{self.bidSize}]'
+
+    def get_post_market_price(self):
+        url = f"https://finance.yahoo.com/quote/{self.symbol}?p={self.symbol}"
+        response = requests.get(url, headers={'Cache-Control': 'no-cache'})
+        soup = BeautifulSoup(response.text, 'html.parser')
+        try:
+            value = soup.find('fin-streamer', {'data-field': 'postMarketPrice'}).text
+            value = re.findall(r'\d+\.\d+', value)[0]
+            if value is not None:
+                return value
+        except Exception:
+            return -1
+        
+        return 0
+
+    def get_pre_market_price(self):
+        url = f"https://finance.yahoo.com/quote/{self.symbol}?p={self.symbol}"
+        response = requests.get(url, headers={'Cache-Control': 'no-cache'})
+        soup = BeautifulSoup(response.text, 'html.parser')
+        try:
+            value = soup.find('fin-streamer', {'data-field': 'preMarketPrice'}).text
+            value = re.findall(r'\d+\.\d+', value)[0]
+            if value is not None:
+                return value
+        except Exception as ex:
+            logging.error(f'{ex}')
+            return -1
+        
+        return 0
 
     @staticmethod
     def fetch_ticker_data(symbol: str):

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Stock</title>
+</head>
+<body>
+    <table>
+        <tbody>
+            <tr>
+                <td><a href="/admin">Admin</a></td>
+                <td>Main</td>
+            </tr>
+        </tbody>
+    </table>
+    <h1>Create New Stock</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create</button>
+    </form>
+</body>
+</html>

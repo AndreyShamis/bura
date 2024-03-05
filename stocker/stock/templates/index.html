@@ -25,13 +25,12 @@
         <tbody>
             <tr>
                 <td><a href="/admin">Admin</a></td>
-                <td>Main</td>
+                <td><a href="/stock">Main</a></td>
+                <td><a href="/stock/create/">Add Stock</a></td>
             </tr>
         </tbody>
     </table>
-</body>
-</html>
-<body>
+
     <h4>Tickers</h4>
     <table>
         <thead>
@@ -46,6 +45,8 @@
                 <th>dayHigh</th>
                 <th>dayLow</th>
                 <th>previousClose</th>
+                <th>PRE_MARKET</th>
+                <th>POST_MARKET</th>
                 <th>quoteType</th>
                 <th>targetHighPrice</th>
                 <th>targetLowPrice</th>
@@ -67,6 +68,8 @@
                 <td>{{ ticker.dayHigh }}</td>
                 <td>{{ ticker.dayLow }}</td>
                 <td>{{ ticker.previousClose }}</td>
+                <td>{{ ticker.preMarket }}</td>
+                <td>{{ ticker.postMarket }}</td>
                 <td>{{ ticker.quoteType }}</td>
                 <td>{{ ticker.targetHighPrice }}</td>
                 <td>{{ ticker.targetLowPrice }}</td>
