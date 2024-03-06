@@ -4,13 +4,37 @@ import yfinance as yf
 import pandas as pd
 from .models import Stock, Ticker
 from .utils.thread_manager import thread_manager
-from .utils.helpers import start_loop_parse
+from .utils.helpers import start_loop_parse, get_market_status
 from .forms import StockForm
+import logging
+import sys
+
+
+DATETIME_FORMAT = '%Y/%m/%d %H:%M:%S'
+
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(module)10.10s:%(lineno)4.4d | %(levelname)-5.5s  - %(message)s', datefmt='%d/%m/%y %H:%M:%S')
+
+
+# Create logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Create formatter
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(lineno)d - %(message)s')
+
+# Create console handler
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
 
 def index(request):
     tickers = Ticker.objects.all()
     context = {
         'tickers':  tickers,
+        'stat': get_market_status(),
     }
     if thread_manager.get_thread_count()  == 0:
         thread_manager.start_thread(start_loop_parse,)

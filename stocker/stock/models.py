@@ -1,4 +1,5 @@
 from datetime import datetime
+import threading
 from django.db import models
 from django.utils import timezone
 from rest_framework.views import APIView
@@ -11,7 +12,7 @@ from bs4 import BeautifulSoup
 import pprint
 import re
 import logging
-
+from .utils.thread_manager import thread_manager
 
 class Exchange(models.Model):
     name = models.CharField(max_length=255)
@@ -28,13 +29,23 @@ class Sector(models.Model):
     
     @staticmethod
     def fetch_sector(name, sectorKey, sectorDisp):
-        obj, created = Sector.objects.get_or_create(name=name, sectorKey=sectorKey, sectorDisp=sectorDisp)
-        obj.save()
-        return obj
-    
+        try:
+            thread_manager.lock.acquire()
+            obj, created = Sector.objects.get_or_create(name=name, sectorKey=sectorKey, sectorDisp=sectorDisp)
+            obj.save()
+            return obj
+        except Exception as ex:
+            logging.error(f'[Sector:fetch_sector]{ex}')
+            return None
+        finally:
+            try:
+                thread_manager.lock.release()
+            except:
+                pass
+
     def __str__(self):
         return f'{self.sectorDisp}'
-
+ 
 
 class Industry(models.Model):
     industryKey = models.CharField(max_length=100, null=True, unique=True)
@@ -49,13 +60,23 @@ class Industry(models.Model):
     @staticmethod
     def fetch_industry(name, industryKey, industryDisp, sector):
         try:
+            thread_manager.lock.acquire()
             obj, created = Industry.objects.get_or_create(name=name, industryKey=industryKey, industryDisp=industryDisp, sector=sector)
             obj.save()
             return obj
-        except Exception:
+        except Exception as ex:
+            logging.error(f'[Industry:fetch_industry]{ex}')
             return None
+        finally:
+            try:
+                thread_manager.lock.release()
+            except:
+                pass
 
 class Ticker(models.Model):
+
+    lock = threading.Lock()
+    
     symbol = models.CharField(max_length=10, unique=True)
 
     preMarket = models.FloatField(null=True, blank=True)
@@ -192,37 +213,43 @@ class Ticker(models.Model):
     volume = models.BigIntegerField(null=True, blank=True)
     website = models.URLField(max_length=200, null=True, blank=True)
     zipCode = models.CharField(max_length=10, null=True, blank=True)
-
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+        'Cache-Control': 'no-cache',
+    }
+    urlka = 'https://finance.yahoo.com/quote/'
     def __str__(self):
         return f'{self.symbol} - {self.currentPrice} [{self.askSize}/{self.bidSize}]'
 
+
     def get_post_market_price(self):
-        url = f"https://finance.yahoo.com/quote/{self.symbol}?p={self.symbol}"
-        response = requests.get(url, headers={'Cache-Control': 'no-cache'})
-        soup = BeautifulSoup(response.text, 'html.parser')
         try:
+            response = requests.get(f"{self.urlka}{self.symbol}", headers=self.headers)
+            soup = BeautifulSoup(response.text, 'html.parser')
             value = soup.find('fin-streamer', {'data-field': 'postMarketPrice'}).text
             value = re.findall(r'\d+\.\d+', value)[0]
             if value is not None:
                 return value
-        except Exception:
+        except Exception as ex:
+            logging.error(f'[get_post_market_price]{self.symbol}:{ex}')
             return -1
-        
         return 0
 
     def get_pre_market_price(self):
-        url = f"https://finance.yahoo.com/quote/{self.symbol}?p={self.symbol}"
-        response = requests.get(url, headers={'Cache-Control': 'no-cache'})
-        soup = BeautifulSoup(response.text, 'html.parser')
         try:
+            response = requests.get(f"{self.urlka}{self.symbol}", headers=self.headers)
+            soup = BeautifulSoup(response.text, 'html.parser')
             value = soup.find('fin-streamer', {'data-field': 'preMarketPrice'}).text
             value = re.findall(r'\d+\.\d+', value)[0]
             if value is not None:
                 return value
         except Exception as ex:
-            logging.error(f'{ex}')
+            logging.error(f'[get_pre_market_price]{self.symbol}:{ex}')
             return -1
-        
         return 0
 
     @staticmethod
@@ -230,12 +257,11 @@ class Ticker(models.Model):
         # Fetch data using yfinance
         ticker = yf.Ticker(symbol)
         ticker_info = ticker.info
-
-        # Create or update Ticker object
+        Ticker.lock.acquire()        # Create or update Ticker object
         obj, created = Ticker.objects.get_or_create(symbol=symbol)
+        Ticker.lock.release()
         for field in Ticker._meta.fields:
             field_name = field.name
-
             if field_name != 'id':  # Exclude id and symbol fields
                 field_name_search = field_name
                 if field_name == 'openPrice':
@@ -243,6 +269,9 @@ class Ticker(models.Model):
                 if field_name == 'zipCode':
                     field_name_search = 'zip'
                 value = ticker_info.get(field_name_search)
+                if field_name == 'bidSize':
+                    if symbol == 'NVDA':
+                        pass
                 if value is not None:
                     if isinstance(field, models.DateTimeField) and not isinstance(value, str):
                         # Convert non-string datetime to string
@@ -250,10 +279,18 @@ class Ticker(models.Model):
                     setattr(obj, field_name, value)
 
 
-        sector = Sector.fetch_sector(obj.sector, obj.sectorKey, obj.sectorDisp)
-        Industry.fetch_industry(obj.industry, obj.industryDisp, obj.industryKey, sector)
-        obj.save()
-
+        try:
+            #sector = Sector.fetch_sector(obj.sector, obj.sectorKey, obj.sectorDisp)
+            #Industry.fetch_industry(obj.industry, obj.industryDisp, obj.industryKey, sector)
+            thread_manager.lock.acquire()
+            obj.save()
+        except:
+            pass
+        finally:
+            try:
+                thread_manager.lock.release()
+            except:
+                pass
         return obj
     
 
