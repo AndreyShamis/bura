@@ -2,6 +2,9 @@ import time
 from .thread_manager import thread_manager
 from ..models import Ticker 
 from datetime import datetime, timedelta, time as ddtime
+from keras.models import model_from_json
+from keras.models import Sequential
+from keras.layers import Dense
 
 
 def get_market_status():
@@ -60,7 +63,7 @@ def periodc_get_pre_market_for_all_tickers():
             time.sleep(0.021)
         thread_manager.start_thread(Ticker.fetch_ticker_data, ticker.symbol)
         #Ticker.fetch_ticker_data(ticker.symbol)
-        time.sleep(0.05)
+        time.sleep(0.09)
     print(f'FINISH PARSE {tickers.count()} Thread {thread_manager.get_thread_count()}')
 
 
@@ -77,3 +80,67 @@ def start_loop_parse():
         if thread_manager.get_thread_count() > 40:
             thread_manager.stop_all_threads()
             time.sleep(2)
+
+
+def get_precent(total: float, part: float) -> float:
+    """
+    Calculates the percentage of 'part' in 'total', rounded to 3 digits.
+    Returns 0 if 'part' is 0.
+
+    Args:
+        total: The total value.
+        part: The value to be compared.
+
+    Returns:
+        The percentage of 'part' in 'total', rounded to 3 digits, or 0 if 'part' is 0.
+    """
+    if part == 0:
+        return 0
+    return round(part / total * 100, 3)
+
+
+def get_part(percent: float, total: float) -> float:
+    """
+    Calculates the part value, given a percentage and a total value.
+
+    Args:
+        percent: The percentage.
+        total: The total value.
+
+    Returns:
+        The part value.
+    """
+    return percent / 100 * total
+
+
+def save_model(model: Sequential, model_path: str, weights_path: str):
+    model_json = model.to_json()
+    with open(model_path, "w") as json_file:
+        json_file.write(model_json)
+
+    model.save_weights(weights_path)
+
+
+def load_model(model_path: str, weights_path: str) -> Sequential:
+    json_file = open(model_path, 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    loaded_model = model_from_json(loaded_model_json)
+    loaded_model.load_weights(weights_path)
+    # Compile loaded model
+    loaded_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    return loaded_model
+
+
+def create_moodel(input_dim=100, num_classes=5) -> Sequential:
+        # Создание модели
+    model = Sequential()
+    model.add(Dense(128, input_dim=input_dim, activation='relu')) # Входной слой
+    model.add(Dense(64, activation='relu')) # Скрытый слой
+    model.add(Dense(num_classes, activation='softmax')) # Выходной слой с 5 нейронами для классификации JSON, CSV, XML, HTML и другого формата
+
+    # Компиляция модели
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    return model
