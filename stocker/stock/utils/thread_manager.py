@@ -2,6 +2,11 @@ import threading
 import time
 
 
+MAX_THREADS_ALLOWED = 3  # Set the maximum number of threads allowed
+LOOP_MAX_TIME_WAIT = 2    # Maximum time (in seconds) to wait for a thread to become available
+
+
+
 class ThreadManager:
     threads = []
     def __init__(self):
@@ -14,14 +19,26 @@ class ThreadManager:
         self.cleanup_thread.daemon = True
         self.cleanup_thread.start()
 
+    def __del__(self):
+        self.stop_all_threads()
+
     def start_thread(self, func, *args, **kwargs):
-        thread = threading.Thread(target=self._thread_wrapper, args=(func, args, kwargs))
-        thread.daemon = True
-        self.lock.acquire()
-        self.threads.append(thread)
-        self.thread_count += 1
-        self.lock.release()
-        thread.start()
+        start_time = time.time()
+        while True:
+            self.lock.acquire()
+            if self.thread_count < MAX_THREADS_ALLOWED:
+                thread = threading.Thread(target=self._thread_wrapper, args=(func, args, kwargs))
+                thread.daemon = True
+                self.threads.append(thread)
+                self.thread_count += 1
+                self.lock.release()
+                thread.start()
+                break
+            self.lock.release()
+            if time.time() - start_time > LOOP_MAX_TIME_WAIT:
+                print("Maximum wait time exceeded. Unable to start a new thread.")
+                break
+            time.sleep(0.1)  # Add a small delay to avoid excessive CPU usage
 
     def _thread_wrapper(self, func, args, kwargs):
         try:
@@ -49,8 +66,8 @@ class ThreadManager:
         finished_threads = [thread for thread in self.threads if not thread.is_alive()]
         for thread in finished_threads:
             self.threads.remove(thread)
-            self.thread_count -= 1
-            self.threads_executed += 1
+        self.thread_count -= len(finished_threads)
+        self.threads_executed += len(finished_threads)
         self.lock.release()
 
     def get_thread_count(self):

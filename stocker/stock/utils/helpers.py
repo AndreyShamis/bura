@@ -1,3 +1,5 @@
+import logging
+import random
 import time
 from .thread_manager import thread_manager
 from ..models import Ticker 
@@ -9,6 +11,7 @@ from keras.layers import Dense
 
 def get_market_status():
     current_time = datetime.utcnow().time()
+    current_date = datetime.utcnow().date()
     market_open_time = ddtime(9, 30)  # Market open time (e.g., 9:30 AM)
     market_close_time = ddtime(16, 0)  # Market close time (e.g., 4:00 PM)
     pre_market_open_time = ddtime(4, 0)  # Pre-market open time (e.g., 4:00 AM)
@@ -17,8 +20,11 @@ def get_market_status():
     post_market_close_time = ddtime(20, 0)  # Post-market close time (e.g., 8:00 PM)
 
     # Adjust current time to UTC
-    current_time_utc = (datetime.utcnow() - timedelta(hours=5)).time()  # Adjust for UTC+5 timezone
-
+    current_time_utc = (datetime.utcnow() - timedelta(hours=4)).time()  # Adjust for UTC+5 timezone
+    # Check if the current day is a weekend
+    if current_date.weekday() in [5, 6]:  # Saturday (5) or Sunday (6)
+        return "Closed"
+    
     # Check current time against trading hours
     if market_open_time <= current_time_utc < market_close_time:
         return "Market"
@@ -51,33 +57,37 @@ def get_post_single(ticker: Ticker):
         except:
             pass
 
-def periodc_get_pre_market_for_all_tickers():
+def periodc_get_pre_market_for_all_tickers(mar: str = 'Closed'):
     tickers = Ticker.objects.all()
-    mar = get_market_status()
+    
     for ticker in tickers:
         if mar == 'PreMarket':
             thread_manager.start_thread(get_pre_single, ticker)
-            time.sleep(0.031)
+            time.sleep(0.031 + random.randint(1, 100) * 0.011)  # Adjust the interval as needed
         if mar == 'PostMarket':
             thread_manager.start_thread(get_post_single, ticker)
-            time.sleep(0.021)
+            time.sleep(0.021 + random.randint(1, 10)/10 )
         thread_manager.start_thread(Ticker.fetch_ticker_data, ticker.symbol)
         #Ticker.fetch_ticker_data(ticker.symbol)
-        time.sleep(0.09)
-    print(f'FINISH PARSE {tickers.count()} Thread {thread_manager.get_thread_count()}')
+        time.sleep(0.09 + random.randint(1, 10)/100)
+    logging.info(f'FINISH PARSE {tickers.count()} Thread {thread_manager.get_thread_count()}')
 
 
 def start_loop_parse():
     while True:
-        periodc_get_pre_market_for_all_tickers()
-        time.sleep(0.3)
-        if thread_manager.get_thread_count() > 20:
-            time.sleep(0.6)
+        mar = get_market_status()
+        periodc_get_pre_market_for_all_tickers(mar)
+        time.sleep(0.1)
+        if mar == 'Closed':
+            time.sleep(5)
+            continue
+        if thread_manager.get_thread_count() > 10:
+            time.sleep(2.6)
         thread_manager.close_finished_threads()
         if thread_manager.get_thread_count() > 20:
-            time.sleep(0.6)
+            time.sleep(5)
         thread_manager.close_finished_threads()
-        if thread_manager.get_thread_count() > 40:
+        if thread_manager.get_thread_count() > 100:
             thread_manager.stop_all_threads()
             time.sleep(2)
 

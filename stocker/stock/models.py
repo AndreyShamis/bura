@@ -10,6 +10,7 @@ import yfinance as yf
 import requests
 from bs4 import BeautifulSoup
 import pprint
+import time
 import re
 import logging
 from .utils.thread_manager import thread_manager
@@ -240,15 +241,18 @@ class Ticker(models.Model):
         return 0
 
     def get_pre_market_price(self):
+        dbg = ''
         try:
             response = requests.get(f"{self.urlka}{self.symbol}", headers=self.headers)
             soup = BeautifulSoup(response.text, 'html.parser')
-            value = soup.find('fin-streamer', {'data-field': 'preMarketPrice'}).text
-            value = re.findall(r'\d+\.\d+', value)[0]
-            if value is not None:
-                return value
+            dbg = soup.find('fin-streamer', {'data-field': 'preMarketPrice'})
+            if dbg is not None:
+                value = dbg.text
+                value = re.findall(r'\d+\.\d+', value)
+                if value:
+                    return value[0]
         except Exception as ex:
-            logging.error(f'[get_pre_market_price]{self.symbol}:{ex}')
+            logging.error(f'[get_pre_market_price]{self.symbol}:{ex} - {dbg}')
             return -1
         return 0
 
@@ -256,7 +260,12 @@ class Ticker(models.Model):
     def fetch_ticker_data(symbol: str):
         # Fetch data using yfinance
         ticker = yf.Ticker(symbol)
-        ticker_info = ticker.info
+        try:
+            ticker_info = ticker.info
+        except Exception as ex:
+            logging.error(f'[fetch_ticker_data]{symbol}:{ex}')
+            time.sleep(0.3)
+            return None
         Ticker.lock.acquire()        # Create or update Ticker object
         obj, created = Ticker.objects.get_or_create(symbol=symbol)
         Ticker.lock.release()

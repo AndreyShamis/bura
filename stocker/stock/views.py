@@ -8,7 +8,7 @@ from .utils.helpers import start_loop_parse, get_market_status, load_model, save
 from .forms import StockForm
 import logging
 import sys
-
+from .templatetags.custom_filters import *
 
 from sklearn.model_selection import train_test_split
 from keras.preprocessing.text import Tokenizer
@@ -36,7 +36,7 @@ logger.addHandler(ch)
 
 
 def index(request):
-    tickers = Ticker.objects.all()
+    tickers = Ticker.objects.all().order_by('symbol')
     context = {
         'tickers':  tickers,
         'stat': get_market_status(),
@@ -51,7 +51,7 @@ def index(request):
 def stock_data(request, stock='NVDA'):
     symbol = stock
     # Fetch stock data using yfinance
-    stock_data = yf.download(symbol, start='2024-01-01', end='2024-03-03')
+    stock_data = yf.download(symbol, start='2024-03-01', end='2024-03-16')
     stock_data = stock_data.rename(columns={'Adj Close': 'Adjusted'})
 
     # Преобразование DataFrame в список словарей
