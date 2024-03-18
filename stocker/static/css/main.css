@@ -28,7 +28,7 @@ body {
 
 .container {
     max-width: 2400px;
-    margin-top: 50px;
+    margin-top: -50px;
 }
 .card:hover {
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
