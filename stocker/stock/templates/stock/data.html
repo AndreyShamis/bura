@@ -1,62 +1,370 @@
-<!-- stock_data.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Data</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
-</head>
-<body>
-    <table>
-        <tbody>
-            <tr>
-                <td><a href="/admin">Admin</a></td>
-                <td><a href="/stock">Main</a></td>
-                <td><a href="/stock/create/">Add Stock</a></td>
-            </tr>
-        </tbody>
-    </table>
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="card shadow mt-5">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Ticker Details</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="mb-3 bold">Symbol: {{ ticker.symbol }}</div>
+                <div class="mb-3 bold">Current Price: {{ ticker.currentPrice }}</div>
+                <div class="mb-3 bold">Open Price: {{ ticker.openPrice }}</div>
 
-    <h4>Stock Data <strong style='color: red;'>{{ symbol }}</strong></h4>
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Open</th>
-                <th>High</th>
-                <th>Low</th>
-                <th>Close</th>
-                <th>Adj Close</th>
-                <th>Volume</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in stock_data %}
-            <tr>
-                <td>{{ row.Date }}</td>
-                <td>{{ row.Open }}</td>
-                <td>{{ row.High }}</td>
-                <td>{{ row.Low }}</td>
-                <td>{{ row.Close }}</td>
-                <td>{{ row.Adjusted }}</td>
-                <td>{{ row.Volume }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+                
+                <div class="mb-3">Market Cap: {{ ticker.marketCap }}</div>
+                <div class="mb-3">52 Week High: {{ ticker.fiftyTwoWeekHigh }}</div>
+                <div class="mb-3">52 Week Low: {{ ticker.fiftyTwoWeekLow }}</div>
+                <div class="mb-3">Pre-Market: {{ ticker.preMarket }}</div>
+                <div class="mb-3">Post-Market: {{ ticker.postMarket }}</div>
+                <div class="mb-3">52 Week Change: {{ ticker.fiftyTwoWeekChange }}</div>
+                <div class="mb-3">S&P 52 Week Change: {{ ticker.SandP52WeekChange }}</div>
+                <div class="mb-3">Address 1: {{ ticker.address1 }}</div>
+                <div class="mb-3 bold">Ask: {{ ticker.ask }}</div>
+                <div class="mb-3">Ask Size: {{ ticker.askSize }}</div>
+                <div class="mb-3 bold">Bid: {{ ticker.bid }}</div>
+                <div class="mb-3">Bid Size: {{ ticker.bidSize }}</div>
+                <div class="mb-3">Audit Risk: {{ ticker.auditRisk }}</div>
+                <div class="mb-3">Average Daily Volume (10 Day): {{ ticker.averageDailyVolume10Day }}</div>
+                <div class="mb-3">Average Volume: {{ ticker.averageVolume }}</div>
+                <div class="mb-3">Average Volume (10 days): {{ ticker.averageVolume10days }}</div>
+                <div class="mb-3">Quote Type: {{ ticker.quoteType }}</div>
+
+            </div>
+            <div class="col-md-2">
+                <div class="mb-3">Long Name: {{ ticker.longName }}</div>
+                <div class="mb-3">Industry: {{ ticker.industry }}</div>
+                <div class="mb-3">Sector: {{ ticker.sector }}</div>
+                <div class="mb-3">Beta: {{ ticker.beta }}</div>
+                <div class="mb-3">Board Risk: {{ ticker.boardRisk }}</div>
+                <div class="mb-3">Book Value: {{ ticker.bookValue }}</div>
+                <div class="mb-3">City: {{ ticker.city }}</div>
+                <div class="mb-3">Compensation As Of Epoch Date: {{ ticker.compensationAsOfEpochDate }}</div>
+                <div class="mb-3">Compensation Risk: {{ ticker.compensationRisk }}</div>
+                <div class="mb-3">Country: {{ ticker.country }}</div>
+                <div class="mb-3">Currency: {{ ticker.currency }}</div>
+                <div class="mb-3">Current Ratio: {{ ticker.currentRatio }}</div>
+                <div class="mb-3">Date Short Interest: {{ ticker.dateShortInterest }}</div>
+                <div class="mb-3">Day High: {{ ticker.dayHigh }}</div>
+                <div class="mb-3">Day Low: {{ ticker.dayLow }}</div>
+                <div class="mb-3">Debt To Equity: {{ ticker.debtToEquity }}</div>
+                <div class="mb-3">Dividend Rate: {{ ticker.dividendRate }}</div>
+                <div class="mb-3">Dividend Yield: {{ ticker.dividendYield }}</div>
+                <div class="mb-3">Earnings Growth: {{ ticker.earningsGrowth }}</div>
+                <div class="mb-3">Earnings Quarterly Growth: {{ ticker.earningsQuarterlyGrowth }}</div>
+                <div class="mb-3">EBITDA: {{ ticker.ebitda }}</div>
+                <div class="mb-3">EBITDA Margins: {{ ticker.ebitdaMargins }}</div>
+                <div class="mb-3">Enterprise To EBITDA: {{ ticker.enterpriseToEbitda }}</div>
+                <div class="mb-3">Enterprise To Revenue: {{ ticker.enterpriseToRevenue }}</div>
+                <div class="mb-3">Enterprise Value: {{ ticker.enterpriseValue }}</div>
+
+            </div>
+            <div class="col-md-2">
+                <div class="mb-3">Ex-Dividend Date: {{ ticker.exDividendDate }}</div>
+                <div class="mb-3">Exchange: {{ ticker.exchange }}</div>
+                <div class="mb-3">50 Day Average: {{ ticker.fiftyDayAverage }}</div>
+                <div class="mb-3">Financial Currency: {{ ticker.financialCurrency }}</div>
+                <div class="mb-3">First Trade Date Epoch UTC: {{ ticker.firstTradeDateEpochUtc }}</div>
+                <div class="mb-3">5 Year Avg Dividend Yield: {{ ticker.fiveYearAvgDividendYield }}</div>
+                <div class="mb-3">Float Shares: {{ ticker.floatShares }}</div>
+                <div class="mb-3">Forward EPS: {{ ticker.forwardEps }}</div>
+                <div class="mb-3">Forward PE: {{ ticker.forwardPE }}</div>
+                <div class="mb-3">Free Cashflow: {{ ticker.freeCashflow }}</div>
+                <div class="mb-3">Full Time Employees: {{ ticker.fullTimeEmployees }}</div>
+                <div class="mb-3">GMT Offset Milliseconds: {{ ticker.gmtOffSetMilliseconds }}</div>
+                <div class="mb-3">Governance Epoch Date: {{ ticker.governanceEpochDate }}</div>
+                <div class="mb-3">Gross Margins: {{ ticker.grossMargins }}</div>
+                <div class="mb-3">Held Percent Insiders: {{ ticker.heldPercentInsiders }}</div>
+                <div class="mb-3">Held Percent Institutions: {{ ticker.heldPercentInstitutions }}</div>
+                <div class="mb-3">Implied Shares Outstanding: {{ ticker.impliedSharesOutstanding }}</div>
+                <div class="mb-3">Industry Disp: {{ ticker.industryDisp }}</div>
+                <div class="mb-3">Industry Key: {{ ticker.industryKey }}</div>
+                <div class="mb-3">Last Dividend Date: {{ ticker.lastDividendDate }}</div>
+                <div class="mb-3">Last Dividend Value: {{ ticker.lastDividendValue }}</div>
+            </div>
+            <div class="col-md-2">
+                <div class="mb-3">Last Fiscal Year End: {{ ticker.lastFiscalYearEnd }}</div>
+                <div class="mb-3">Last Split Date: {{ ticker.lastSplitDate }}</div>
+                <div class="mb-3">Last Split Factor: {{ ticker.lastSplitFactor }}</div>
+                <div class="mb-3">Max Age: {{ ticker.maxAge }}</div>
+                <div class="mb-3">Message Board ID: {{ ticker.messageBoardId }}</div>
+                <div class="mb-3">Most Recent Quarter: {{ ticker.mostRecentQuarter }}</div>
+                <div class="mb-3">Net Income To Common: {{ ticker.netIncomeToCommon }}</div>
+                <div class="mb-3">Next Fiscal Year End: {{ ticker.nextFiscalYearEnd }}</div>
+                <div class="mb-3">Number Of Analyst Opinions: {{ ticker.numberOfAnalystOpinions }}</div>
+                <div class="mb-3">Operating Cashflow: {{ ticker.operatingCashflow }}</div>
+                <div class="mb-3">Operating Margins: {{ ticker.operatingMargins }}</div>
+                <div class="mb-3">Overall Risk: {{ ticker.overallRisk }}</div>
+                <div class="mb-3">Payout Ratio: {{ ticker.payoutRatio }}</div>
+                <div class="mb-3">PEG Ratio: {{ ticker.pegRatio }}</div>
+                <div class="mb-3">Phone: {{ ticker.phone }}</div>
+                <div class="mb-3">Previous Close: {{ ticker.previousClose }}</div>
+                <div class="mb-3">Price Hint: {{ ticker.priceHint }}</div>
+                <div class="mb-3">Price To Book: {{ ticker.priceToBook }}</div>
+                <div class="mb-3">Price To Sales Trailing 12 Months: {{ ticker.priceToSalesTrailing12Months }}</div>
+                <div class="mb-3">Profit Margins: {{ ticker.profitMargins }}</div>
+                <div class="mb-3">Quick Ratio: {{ ticker.quickRatio }}</div>
+            </div>
+            <div class="col-md-2">
+                <div class="mb-3 bold">Recommendation Key: {{ ticker.recommendationKey }}</div>
+                <div class="mb-3">Recommendation Mean: {{ ticker.recommendationMean }}</div>
+                <div class="mb-3">Regular Market Day High: {{ ticker.regularMarketDayHigh }}</div>
+                <div class="mb-3">Regular Market Day Low: {{ ticker.regularMarketDayLow }}</div>
+                <div class="mb-3">Regular Market Open: {{ ticker.regularMarketOpen }}</div>
+                <div class="mb-3">Regular Market Previous Close: {{ ticker.regularMarketPreviousClose }}</div>
+                <div class="mb-3">Regular Market Volume: {{ ticker.regularMarketVolume }}</div>
+                <div class="mb-3">Return On Assets: {{ ticker.returnOnAssets }}</div>
+                <div class="mb-3">Return On Equity: {{ ticker.returnOnEquity }}</div>
+                <div class="mb-3">Revenue Growth: {{ ticker.revenueGrowth }}</div>
+                <div class="mb-3">Revenue Per Share: {{ ticker.revenuePerShare }}</div>
+                <div class="mb-3">Sector Disp: {{ ticker.sectorDisp }}</div>
+                <div class="mb-3">Sector Key: {{ ticker.sectorKey }}</div>
+                <div class="mb-3">Shareholder Rights Risk: {{ ticker.shareHolderRightsRisk }}</div>
+                <div class="mb-3">Shares Outstanding: {{ ticker.sharesOutstanding }}</div>
+                <div class="mb-3">Shares Percent Shares Out: {{ ticker.sharesPercentSharesOut }}</div>
+                <div class="mb-3">Shares Short: {{ ticker.sharesShort }}</div>
+                <div class="mb-3">Shares Short Previous Month Date: {{ ticker.sharesShortPreviousMonthDate }}</div>
+                <div class="mb-3">Shares Short Prior Month: {{ ticker.sharesShortPriorMonth }}</div>
+                <div class="mb-3">Short Name: {{ ticker.shortName }}</div>
+                <div class="mb-3">Short Percent Of Float: {{ ticker.shortPercentOfFloat }}</div>
+                <div class="mb-3">Short Ratio: {{ ticker.shortRatio }}</div>
+            </div>
+            <div class="col-md-2">
+                <div class="mb-3">State: {{ ticker.state }}</div>
+                <div class="mb-3">Target High Price: {{ ticker.targetHighPrice }}</div>
+                <div class="mb-3">Target Low Price: {{ ticker.targetLowPrice }}</div>
+                <div class="mb-3">Target Mean Price: {{ ticker.targetMeanPrice }}</div>
+                <div class="mb-3">Target Median Price: {{ ticker.targetMedianPrice }}</div>
+                <div class="mb-3">Time Zone Full Name: {{ ticker.timeZoneFullName }}</div>
+                <div class="mb-3">Time Zone Short Name: {{ ticker.timeZoneShortName }}</div>
+                <div class="mb-3">Total Cash: {{ ticker.totalCash }}</div>
+                <div class="mb-3">Total Cash Per Share: {{ ticker.totalCashPerShare }}</div>
+                <div class="mb-3">Total Debt: {{ ticker.totalDebt }}</div>
+                <div class="mb-3">Total Revenue: {{ ticker.totalRevenue }}</div>
+                <div class="mb-3">Trailing Annual Dividend Rate: {{ ticker.trailingAnnualDividendRate }}</div>
+                <div class="mb-3">Trailing Annual Dividend Yield: {{ ticker.trailingAnnualDividendYield }}</div>
+                <div class="mb-3">Trailing EPS: {{ ticker.trailingEps }}</div>
+                <div class="mb-3">Trailing PE: {{ ticker.trailingPE }}</div>
+                <div class="mb-3">Trailing PEG Ratio: {{ ticker.trailingPegRatio }}</div>
+                <div class="mb-3">200 Day Average: {{ ticker.twoHundredDayAverage }}</div>
+                <div class="mb-3">Underlying Symbol: {{ ticker.underlyingSymbol }}</div>
+                {% comment %} <div class="mb-3">UUID: {{ ticker.uuid }}</div> {% endcomment %}
+                <div class="mb-3">Volume: {{ ticker.volume }}</div>
+                <div class="mb-3">Website: {{ ticker.website }}</div>
+                <div class="mb-3">Zip Code: {{ ticker.zipCode }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Stock Data <strong>{{ symbol }}</strong></h4>
+            <div>
+                <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#filterModal">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="table-tab" data-bs-toggle="tab" href="#table" role="tab" aria-controls="table" aria-selected="true">Table</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="visualization-tab" data-bs-toggle="tab" href="#visualization" role="tab" aria-controls="visualization" aria-selected="false">Visualization</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="table" role="tabpanel" aria-labelledby="table-tab">
+                    <div class="table-responsive">
+                        <table id="tickerDataList" class="table table-hover table-bordered" style="width:100%">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Open</th>
+                                    <th>High</th>
+                                    <th>Low</th>
+                                    <th>Close</th>
+                                    <th>Adj Close</th>
+                                    <th>Volume</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in stock_data %}
+                                <tr>
+                                    <td>{{ row.Date }}</td>
+                                    <td>{{ row.Open }}</td>
+                                    <td>{{ row.High }}</td>
+                                    <td>{{ row.Low }}</td>
+                                    <td>{{ row.Close }}</td>
+                                    <td>{{ row.Adjusted }}</td>
+                                    <td>{{ row.Volume }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="visualization" role="tabpanel" aria-labelledby="visualization-tab">
+                    <canvas id="stockChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mt-5">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Stock Data <strong>{{ tickers }}</strong></h4>
+            <div>
+                <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#filterModal">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="stocksTable" class="table table-hover table-bordered" style="width:100%">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Current Price</th>
+                            <th>Change</th>
+                            <th>Change %</th>
+                            <th>Market</th>
+                            <th>Volume</th>
+                            <th>Currency</th>
+                            <th>Market Cap</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in stock_data2 %}
+                        <tr>
+                            <td>{{ row.ticker }}</td>
+                            <td>{{ row.current_price }}</td>
+                            <td>{{ row.change }}</td>
+                            <td>{{ row.change_percent }}</td>
+                            <td>{{ row.market_time }}</td>
+                            <td>{{ row.volume }}</td>
+                            <td>{{ row.currency }}</td>
+                            <td>{{ row.market_cap }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Options</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="startDateInput" class="form-label">Start Date</label>
+                    <input type="text" class="form-control" id="startDateInput" placeholder="Enter start date">
+                </div>
+                <div class="mb-3">
+                    <label for="endDateInput" class="form-label">End Date</label>
+                    <input type="text" class="form-control" id="endDateInput" placeholder="Enter end date">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="applyFilter()">Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function() {
+        var tickerDataTable = $('#tickerDataList').DataTable({
+            responsive: true,
+            order: [[0, 'asc']],
+            pageLength: 100,
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+
+        var stocksTable = $('#stocksTable').DataTable({
+            responsive: true,
+            order: [[0, 'asc']],
+            pageLength: 100,
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+
+        function applyFilter() {
+            var startDate = $('#startDateInput').val();
+            var endDate = $('#endDateInput').val();
+
+            tickerDataTable.draw();
+            stocksTable.draw();
+
+            // Filter the tables based on the date range
+            tickerDataTable.columns(0).search(createDateRangeFilter(startDate, endDate), true, false).draw();
+            stocksTable.columns(0).search(createDateRangeFilter(startDate, endDate), true, false).draw();
+        }
+
+        function createDateRangeFilter(start, end) {
+            // Create a regular expression to match the date range
+            var regex = '^';
+            if (start !== '') {
+                regex += '(' + $.datepicker.formatDate('yy-mm-dd', new Date(start)) + '|';
+            }
+            regex += '\\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\\d|3[01])';
+            if (end !== '') {
+                regex += '|' + $.datepicker.formatDate('yy-mm-dd', new Date(end)) + ')';
+            }
+            regex += '$';
+            return regex;
+        }
+
+        $('#visualization-tab').on('shown.bs.tab', function() {
+            var tableData = tickerDataTable.rows().data().toArray();
+            var labels = tableData.map(function(row) {
+                return row[0]; // Date column
+            });
+            var data = tableData.map(function(row) {
+                return row[4]; // Close column
+            });
+
+            var ctx = document.getElementById('stockChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock Price',
+                        data: data,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

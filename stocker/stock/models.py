@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import threading
+from typing import List
 from django.db import models
 from django.utils import timezone
 from rest_framework.views import APIView
@@ -14,6 +15,8 @@ import time
 import re
 import logging
 from .utils.thread_manager import thread_manager
+
+
 
 class Exchange(models.Model):
     name = models.CharField(max_length=255)
@@ -336,17 +339,77 @@ class Stock(models.Model):
 
 
 class StockPrice(models.Model):
-    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    ticker = models.ForeignKey(Ticker, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=5)
     volume = models.IntegerField()
     market_type = models.CharField(
         max_length=20, choices=[("pre", "Pre-market"), ("post", "Post-market"), ("regular", "Regular market")]
     )
+    urlka = 'https://finance.yahoo.com/quotes/'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+        'Cache-Control': 'no-cache',
+    }
 
     def __str__(self):
-        return f"{self.stock.symbol} - {self.timestamp} - {self.price} - {self.market_type}"
+        return f"{self.ticker.symbol} - {self.timestamp} - {self.price} - {self.market_type}"
 
+
+    @staticmethod
+    def fetch_stock_price(tickers: List[str] = ['AAPL', 'TSLA', 'NVDA', 'AMZN', 'MSFT', 'GOOGL', 'FB', 'BABA', 'BTC-USD'], timestamp=timezone.now(), price=-1, volume=1, market_type='Closed'):
+        try:
+            ticker_string = ",".join(tickers)
+            url = f"{StockPrice.urlka}{ticker_string}/view/v1"
+            response = requests.get(url, headers=StockPrice.headers)
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            stock_data = []
+            for item in soup.select('tr'):
+                data = item.select('td')
+                if len(data) >= 8:
+                    ticker = data[0].text.strip()
+                    current_price = data[1].text.strip()
+                    change = data[2].text.strip()
+                    change_percent = data[3].text.strip()
+                    currency  = data[4].text.strip()
+                    market_time  = data[5].text.strip()
+                    volume = data[6].text.strip()
+                    market_cap = data[12].text.strip()
+
+                    stock_data.append({
+                        'ticker': ticker,
+                        'current_price': current_price,
+                        'change': change,
+                        'change_percent': change_percent,
+                        'market_time': market_time,
+                        'volume': volume,
+                        'currency': currency,
+                        'market_cap': market_cap
+                    })
+
+            return stock_data
+
+        except Exception as e:
+            print(f"Error fetching stock data: {e}")
+            return []
+        try:
+            thread_manager.lock.acquire()
+            obj, created = StockPrice.objects.get_or_create(ticker=ticker, timestamp=timestamp, price=price, volume=volume, market_type=market_type)
+            obj.save()
+            return obj
+        except Exception as ex:
+            logging.error(f'[StockPrice:fetch_stock_price]{ex}')
+            return None
+        finally:
+            try:
+                thread_manager.lock.release()
+            except:
+                pass
 
 class TechnicalIndicator(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)

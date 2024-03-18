@@ -154,3 +154,41 @@ def create_moodel(input_dim=100, num_classes=5) -> Sequential:
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     return model
+
+
+def convert_market_cap(market_cap_str):
+    """
+    Converts a market cap string (e.g., "1.2B", "45.6M", "2.196T") into an integer value.
+
+    Args:
+        market_cap_str (str): The market cap string to be converted.
+
+    Returns:
+        int: The market cap value as an integer.
+    """
+    # Remove any non-digit and non-alphabet characters
+    market_cap_str = ''.join(char for char in market_cap_str if char.isalnum())
+
+    # Check the last character to determine the multiplier
+    multiplier = 1
+    if market_cap_str[-1].isalpha():
+        last_char = market_cap_str[-1].upper()
+        market_cap_str = market_cap_str[:-1]  # Remove the last character
+
+        if last_char == 'T':
+            multiplier = 1000000000000
+        elif last_char == 'B':
+            multiplier = 1000000000
+        elif last_char == 'M':
+            multiplier = 1000000
+        elif last_char == 'K':
+            multiplier = 1000
+
+    # Convert the remaining digits to an integer and multiply by the multiplier
+    try:
+        market_cap_int = int(float(market_cap_str) * multiplier)
+    except ValueError:
+        market_cap_int = 0
+
+    return market_cap_int
+

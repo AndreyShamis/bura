@@ -1,0 +1,75 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Roboto', sans-serif;
+}
+.bold{
+    font-weight: bold !important;
+}
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.card-header {
+    background-color: #343a40;
+    color: #fff;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
+.container {
+    max-width: 2400px;
+    margin-top: 50px;
+}
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+.table-responsive {
+    overflow-x: auto;
+}
+.low {color: #dc3545 !important;}
+.high {color: #28a745 !important;}
+.low_ch {
+    color: #a33f49 !important;
+    font-weight: bold;
+}
+.high_ch {
+    color: #377947 !important;
+    font-weight: bold;
+}
+
+.price {
+    color: #597729 !important;
+    font-weight: bold;
+}
+.progress {
+    width: 80px;
+    height: 20px;
+    display: inline-block;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: bold;
+    line-height: 20px;
+}
+.indicator {
+    width: 80px;
+    height: 10px;
+    background-color: lightgray;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    line-height: 20px;
+}
+
+table.inputs td {
+    padding: 1px;
+}

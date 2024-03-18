@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Data</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.bootstrap5.css">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% comment %} <link rel="stylesheet" href="{% static 'css/jquery.rprogessbar.min.css' %}"> {% endcomment %}
+</head>
+<body>
+    <div class="container py-5">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">MENU</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="menuTable" class="table table-striped table-hover table-bordered" style="width:100%">
+                        <tbody>
+                            <tr>
+                                <td>Market Status <strong>{{ stat }}</strong></td>
+                                <td><a href="/admin">Admin</a></td>
+                                <td><a href="/stock">Main</a></td>
+                                <td><a href="/stock/create/">Add Stock</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% block content %}
+        <!-- Default content -->
+        {% endblock %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.bootstrap5.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {% block script %}
+    <!-- Default script -->
+    {% endblock %}
+</body>
+</html>

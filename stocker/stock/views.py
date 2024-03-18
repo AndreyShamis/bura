@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 import yfinance as yf
 import pandas as pd
-from .models import Stock, Ticker
+from .models import Stock, StockPrice, Ticker
 from .utils.thread_manager import thread_manager
 from .utils.helpers import start_loop_parse, get_market_status, load_model, save_model, create_moodel
 from .forms import StockForm
@@ -13,6 +13,7 @@ from .templatetags.custom_filters import *
 from sklearn.model_selection import train_test_split
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
+from datetime import datetime, timedelta
 
 
 DATETIME_FORMAT = '%Y/%m/%d %H:%M:%S'
@@ -44,14 +45,22 @@ def index(request):
     if thread_manager.get_thread_count()  == 0:
         thread_manager.start_thread(start_loop_parse,)
 
-    return render(request, 'index.html', context)
+    return render(request, 'stock/list.html', context)
 
 
 
 def stock_data(request, stock='NVDA'):
     symbol = stock
-    # Fetch stock data using yfinance
-    stock_data = yf.download(symbol, start='2024-03-01', end='2024-03-16')
+    # Получить сегодняшнюю дату
+    today = datetime.now().date()
+
+    # Вычислить дату 30 дней назад
+    start_date = today - timedelta(days=30)
+
+    # Преобразовать даты в строковый формат, требуемый yfinance
+    start_str = start_date.strftime('%Y-%m-%d')
+    end_str = today.strftime('%Y-%m-%d')
+    stock_data = yf.download(symbol, start=start_str, end=end_str)
     stock_data = stock_data.rename(columns={'Adj Close': 'Adjusted'})
 
     # Преобразование DataFrame в список словарей
@@ -61,11 +70,18 @@ def stock_data(request, stock='NVDA'):
     myTicker = Ticker.fetch_ticker_data(symbol)
     new_stock = Stock()
     new_stock.symbol = ticker.ticker
+    # Пример использования
+    tickers = "AAPL,ABBNY,AI,AMZN,ARCC,ARKF,ARKG,ARKK,ARKQ,ARKX,BLCN,CFG,CHMI,COIN,DT,FSLY,GBTC,GOOG,HIVE,IBM,IBOT,INMD,IONQ,LDOS,LRN,META,MNMD,MRNA,MSFT,MTTCF,NEE,NNXPF,NVDA,NXST,PATH,PBW,PLTR,PLUG,PRNT,QS,QTUM,QUBT,SGMO,SHOP,SPCE,STNE,STWD,TDOC,TECL,TM,TQQQ,TSLA,TWLO,VALE,VEEV,VGT,VTVT,XITK,ZTEK,".split(", ")
+    stock_data = StockPrice.fetch_stock_price(tickers)
+
     try:
         new_stock.company_name = ticker.get_info()['longName']
         context = {
+            'ticker':  myTicker,
             'stock_data': data,
             'symbol':  ticker.ticker,
+            'stock_data2': stock_data,
+            'tickers':  ",".join(tickers),
         }
     except Exception:
         myTicker.delete()
