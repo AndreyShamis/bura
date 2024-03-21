@@ -358,10 +358,9 @@ class StockPrice(models.Model):
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.timestamp} - {self.price} - {self.market_type}"
-
-
+    
     @staticmethod
-    def fetch_stock_price(tickers: List[str] = ['AAPL', 'TSLA', 'NVDA', 'AMZN', 'MSFT', 'GOOGL', 'FB', 'BABA', 'BTC-USD'], timestamp=timezone.now(), price=-1, volume=1, market_type='Closed'):
+    def fetch_stickers_yahoo_list(tickers: List[str] = ['AAPL', 'TSLA', 'NVDA', 'AMZN', 'MSFT', 'GOOGL', 'FB', 'BABA', 'BTC-USD']):
         try:
             ticker_string = ",".join(tickers)
             url = f"{StockPrice.urlka}{ticker_string}/view/v1"
@@ -397,11 +396,22 @@ class StockPrice(models.Model):
         except Exception as e:
             print(f"Error fetching stock data: {e}")
             return []
+
+    @staticmethod
+    def fetch_stock_price(tickers: List[str] = ['AAPL', 'TSLA', 'NVDA', 'AMZN', 'MSFT', 'GOOGL', 'FB', 'BABA', 'BTC-USD'], timestamp=timezone.now(), price=-1, volume=1, market_type='Closed'):
+        stock_data = StockPrice.fetch_stickers_yahoo_list(tickers=tickers)
         try:
-            thread_manager.lock.acquire()
-            obj, created = StockPrice.objects.get_or_create(ticker=ticker, timestamp=timestamp, price=price, volume=volume, market_type=market_type)
-            obj.save()
-            return obj
+            objects = []
+            for ticker in stock_data:
+
+                thread_manager.lock.acquire()
+                try:
+                    obj, created = StockPrice.objects.get_or_create(ticker=ticker['ticker'], timestamp=ticker['market_time'], price=ticker['current_price'], volume=ticker['volume'], market_type=market_type)
+                    obj.save()
+                    objects.append(obj) if created else obj
+                except Exception as ex:
+                    logging.error(f'[StockPrice:fetch_stock_price]{ex}')
+                
         except Exception as ex:
             logging.error(f'[StockPrice:fetch_stock_price]{ex}')
             return None

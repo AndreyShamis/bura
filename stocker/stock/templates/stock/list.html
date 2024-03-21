@@ -51,9 +51,9 @@
                         <td>{{ ticker.dayHigh }}</td>
                         <td class="low">{{ ticker.fiftyTwoWeekLow }}</td>
                         <td class="high">{{ ticker.fiftyTwoWeekHigh }}</td>
-                        <td class="{% if ticker.preMarket > ticker.previousClose %}high_ch{% endif %}{% if ticker.preMarket < ticker.previousClose %}low_ch{% endif %}">{{ ticker.previousClose }}</td>
+                        <td>{{ ticker.previousClose }}</td>
                         <td class="{% if ticker.preMarket > ticker.currentPrice %}high_ch{% endif %}{% if ticker.preMarket < ticker.currentPrice %}low_ch{% endif %}">{{ ticker.preMarket }}</td>
-                        <td>{{ ticker.postMarket|default:"-" }}</td>
+                        <td class="{% if ticker.postMarket > ticker.currentPrice %}high_ch{% endif %}{% if ticker.postMarket < ticker.currentPrice %}low_ch{% endif %}">{{ ticker.postMarket|default:"-" }}</td>
                         <td>{{ ticker.fiftyDayAverage }}</td>
                         <td>{{ ticker.exchange }}</td>
                         <td>{{ ticker.quoteType }}</td>

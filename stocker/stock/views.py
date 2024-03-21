@@ -72,7 +72,7 @@ def stock_data(request, stock='NVDA'):
     new_stock.symbol = ticker.ticker
     # Пример использования
     tickers = "AAPL,ABBNY,AI,AMZN,ARCC,ARKF,ARKG,ARKK,ARKQ,ARKX,BLCN,CFG,CHMI,COIN,DT,FSLY,GBTC,GOOG,HIVE,IBM,IBOT,INMD,IONQ,LDOS,LRN,META,MNMD,MRNA,MSFT,MTTCF,NEE,NNXPF,NVDA,NXST,PATH,PBW,PLTR,PLUG,PRNT,QS,QTUM,QUBT,SGMO,SHOP,SPCE,STNE,STWD,TDOC,TECL,TM,TQQQ,TSLA,TWLO,VALE,VEEV,VGT,VTVT,XITK,ZTEK,".split(", ")
-    stock_data = StockPrice.fetch_stock_price(tickers)
+    stock_data = StockPrice.fetch_stickers_yahoo_list(tickers)
 
     try:
         new_stock.company_name = ticker.get_info()['longName']

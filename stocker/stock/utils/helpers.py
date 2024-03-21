@@ -59,6 +59,7 @@ def get_post_single(ticker: Ticker):
 
 def periodc_get_pre_market_for_all_tickers(mar: str = 'Closed'):
     tickers = Ticker.objects.all()
+    #tickers = tickers.cache().iterator()
     
     for ticker in tickers:
         if mar == 'PreMarket':
