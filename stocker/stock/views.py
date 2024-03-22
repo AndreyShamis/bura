@@ -56,20 +56,21 @@ def stock_data(request, stock='NVDA'):
 
     # Вычислить дату 30 дней назад
     start_date = today - timedelta(days=30)
-
+    end_date = today + timedelta(days=1)
     # Преобразовать даты в строковый формат, требуемый yfinance
     start_str = start_date.strftime('%Y-%m-%d')
     end_str = today.strftime('%Y-%m-%d')
+    end_str = end_date.strftime('%Y-%m-%d')
     stock_data = yf.download(symbol, start=start_str, end=end_str)
     stock_data = stock_data.rename(columns={'Adj Close': 'Adjusted'})
 
     # Преобразование DataFrame в список словарей
     data = stock_data.reset_index().to_dict(orient='records')
     # Get information about the company using Ticker
-    ticker = yf.Ticker(symbol)
     myTicker = Ticker.fetch_ticker_data(symbol)
     new_stock = Stock()
-    new_stock.symbol = ticker.ticker
+    new_stock.symbol = myTicker.symbol
+    #new_stock.options_count = len(ticker.options)
     # Пример использования
     tickers = "AAPL,ABBNY,AI,AMZN,ARCC,ARKF,ARKG,ARKK,ARKQ,ARKX,BLCN,CFG,CHMI,COIN,DT,FSLY,GBTC,GOOG,HIVE,IBM,IBOT,INMD,IONQ,LDOS,LRN,META,MNMD,MRNA,MSFT,MTTCF,NEE,NNXPF,NVDA,NXST,PATH,PBW,PLTR,PLUG,PRNT,QS,QTUM,QUBT,SGMO,SHOP,SPCE,STNE,STWD,TDOC,TECL,TM,TQQQ,TSLA,TWLO,VALE,VEEV,VGT,VTVT,XITK,ZTEK,".split(", ")
     stock_data = StockPrice.fetch_stickers_yahoo_list(tickers)
@@ -79,7 +80,7 @@ def stock_data(request, stock='NVDA'):
         context = {
             'ticker':  myTicker,
             'stock_data': data,
-            'symbol':  ticker.ticker,
+            'symbol':  myTicker.symbol,
             'stock_data2': stock_data,
             'tickers':  ",".join(tickers),
         }

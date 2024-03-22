@@ -263,6 +263,7 @@ class Ticker(models.Model):
     def fetch_ticker_data(symbol: str):
         # Fetch data using yfinance
         ticker = yf.Ticker(symbol)
+        last_price = ticker.fast_info['lastPrice']
         try:
             ticker_info = ticker.info
         except Exception as ex:
@@ -288,15 +289,21 @@ class Ticker(models.Model):
                     if isinstance(field, models.DateTimeField) and not isinstance(value, str):
                         # Convert non-string datetime to string
                         value = datetime.fromtimestamp(int(value))
+                    if field_name == 'currentPrice':
+                        if value is None:
+                            value = round(last_price, 2)
                     setattr(obj, field_name, value)
 
-
+        if obj.quoteType == "ETF":
+            obj.currentPrice = round(last_price, 4)
         try:
             #sector = Sector.fetch_sector(obj.sector, obj.sectorKey, obj.sectorDisp)
             #Industry.fetch_industry(obj.industry, obj.industryDisp, obj.industryKey, sector)
             thread_manager.lock.acquire()
+            # if obj.currentPrice is None:
+            #     obj.currentPrice = round(ticker.fast_info['lastPrice'], 2)
             obj.save()
-        except:
+        except Exception as ex:
             pass
         finally:
             try:
@@ -317,6 +324,7 @@ class Stock(models.Model):
     market_cap = models.DecimalField(max_digits=20, decimal_places=2)
     sector = models.CharField(max_length=100, blank=True, null=True)
     industry = models.CharField(max_length=100, blank=True, null=True)
+    options_count = models.IntegerField()
 
     def __str__(self):
         return f"{self.symbol} ({self.company_name}- {self.price})"

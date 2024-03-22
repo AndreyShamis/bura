@@ -78,7 +78,7 @@ def start_loop_parse():
     while True:
         mar = get_market_status()
         periodc_get_pre_market_for_all_tickers(mar)
-        time.sleep(0.1)
+        time.sleep(0.32 + random.randint(1, 10) * 0.01)
         if mar == 'Closed':
             time.sleep(5)
             continue

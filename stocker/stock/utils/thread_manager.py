@@ -38,7 +38,7 @@ class ThreadManager:
             if time.time() - start_time > LOOP_MAX_TIME_WAIT:
                 print("Maximum wait time exceeded. Unable to start a new thread.")
                 break
-            time.sleep(0.1)  # Add a small delay to avoid excessive CPU usage
+            time.sleep(0.05)  # Add a small delay to avoid excessive CPU usage
 
     def _thread_wrapper(self, func, args, kwargs):
         try:
@@ -49,7 +49,7 @@ class ThreadManager:
     def _periodic_cleanup(self):
         while True:
             self.close_finished_threads()
-            time.sleep(0.001)  # Adjust the interval as needed
+            time.sleep(0.002)  # Adjust the interval as needed
 
     def stop_all_threads(self):
         self.lock.acquire()
