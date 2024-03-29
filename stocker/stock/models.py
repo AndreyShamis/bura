@@ -263,7 +263,11 @@ class Ticker(models.Model):
     def fetch_ticker_data(symbol: str):
         # Fetch data using yfinance
         ticker = yf.Ticker(symbol)
-        last_price = ticker.fast_info['lastPrice']
+        last_price = None
+        try:
+            last_price = ticker.fast_info['lastPrice']
+        except Exception as ex:
+            logging.error(f'[fetch_ticker_data]{symbol}:{ex}')
         try:
             ticker_info = ticker.info
         except Exception as ex:
@@ -294,7 +298,7 @@ class Ticker(models.Model):
                             value = round(last_price, 2)
                     setattr(obj, field_name, value)
 
-        if obj.quoteType == "ETF":
+        if obj.quoteType == "ETF" and last_price is not None:
             obj.currentPrice = round(last_price, 4)
         try:
             #sector = Sector.fetch_sector(obj.sector, obj.sectorKey, obj.sectorDisp)
